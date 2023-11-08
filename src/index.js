@@ -1,4 +1,4 @@
-import './style.css'
+//import './style.css'
 
 class Node {
     constructor(x, y) {
@@ -46,7 +46,14 @@ class Gameboard {
         this.nodeList = [];
         this.shipList = [];
     }
-
+createGameboard() {
+        let alphabet=['A','B','C','D','E','F','G','H','I','J']
+        for (let i = 0; i < 10; i++) {
+            for (let j = 0; j < 10;j++) {
+                this.addNode(i + 1,alphabet[j]);
+            }
+        }
+}
     addNode(x, y) {
         let node = new Node(x, y);
         this.nodeList.push(node);
@@ -90,3 +97,9 @@ class Gameboard {
         }
     }
 }
+
+
+// let gameboard = new Gameboard();
+//
+// gameboard.createGameboard();
+// gameboard.printNodes();
