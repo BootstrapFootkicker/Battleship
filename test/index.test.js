@@ -30,3 +30,5 @@ test('ship hit', () => {
     expect(testBoard.findNodeInList(1, 'A').hit).toBe(true);
 
 });
+
+//todo test ship hit
