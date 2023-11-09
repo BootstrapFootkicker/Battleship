@@ -98,8 +98,11 @@ createGameboard() {
     }
 }
 
+class Player{}
 
 // let gameboard = new Gameboard();
 //
 // gameboard.createGameboard();
 // gameboard.printNodes();
+
+module.exports = {Node, Ship, Gameboard, Player};
