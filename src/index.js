@@ -7,6 +7,7 @@ class Node {
         this.hit = false;
         this.hasShip = false;
         this.ship = null;
+        this.edges = [];
     }
 
     setShip(ship) {
@@ -18,6 +19,8 @@ class Node {
     hasShip() {
         return this.hasShip;
     }
+
+
 }
 
 class Ship {
@@ -52,6 +55,11 @@ class Ship {
     getOwner() {
         return this.owner;
     }
+
+       getLength()
+    {
+        return this.length
+    }
 }
 
 class Gameboard {
@@ -69,9 +77,46 @@ class Gameboard {
         }
     }
 
+    isCellValid(x,y)
+    {
+        if(this.findNodeInList(x,y)===null)
+        {
+            return false
+        }
+        else
+        {
+            return true
+        }
+    }
+    isOrientationValid(x, y, ship, orientation) {
+        let alphabet= ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        let alphabetIndex = alphabet.indexOf(y)
+        if (orientation === 'Horizontal')
+        {
+            for (let i =0;i<ship.getLength();i++)
+            {
+                if (this.isCellValid(x,y)===false)
+                {
+
+                    return false
+                }
+                 console.log(`x = ${x} y= ${y}`)
+                x+=1
+            }
+            return true
+        }
+
+
+    }
+
     addNode(x, y) {
         let node = new Node(x, y);
         this.nodeList.push(node);
+    }
+
+    addEdge(node1, node2) {
+        node1.edges.push(node2);
+        node2.edges.push(node1);
     }
 
     addShip(x, y, length, type) {
@@ -118,12 +163,13 @@ class Player {
     constructor(name) {
         this.name = name;
         this.gameboard = new Gameboard();
-        this.shipList= [];
+        this.shipList = [];
     }
 
     getPlayerName() {
         return this.name;
     }
+
     printShips() {
         this.shipList.forEach((ship) => {
             console.log(`Ship: ${ship.type}, Length: ${ship.length}, Owner: ${ship.getOwner().getPlayerName()}`);
@@ -142,25 +188,49 @@ class Player {
         this.shipList.push(new Ship(2, 'Patrol Boat', this));
     }
 
-    placeShip(x, y, length, type, orientation) {
-        let ship = this.shipList.find((ship) => {
-            return ship.type === type;
-        });
-        if (ship === undefined) {
+    placeShip(x, y, ship, orientation) {
+        if (this.gameboard.findNodeInList(x, y) === null) {
             return null;
         }
-        this.gameboard.addShip(x, y, length, type);
         ship.setOrientation(orientation);
+        let node = this.gameboard.findNodeInList(x, y);
+        if (orientation === 'horizontal') {
+
+        }
     }
-
-
 }
+
 
 class Computer extends Player {
     constructor(name) {
         super();
         this.name = name;
         this.gameboard = new Gameboard();
+    }
+
+    randomShipPlacement() {
+        let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        let orientations = ['horizontal', 'vertical'];
+        let x = Math.floor(Math.random() * 10) + 1;
+        let y = alphabet[Math.floor(Math.random() * 10)];
+
+        this.shipList.forEach((ship) => {
+            let orientation = orientations[Math.floor(Math.random() * 2)];
+            this.placeShip(x, y, ship.length, ship.type, orientation);
+        });
+
+    }
+
+    randomAttack(playerGameboard) {
+        let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        let x = Math.floor(Math.random() * 10) + 1;
+        let y = alphabet[Math.floor(Math.random() * 10)];
+
+        if(playerGameboard.gameboard.findNodeInList(x, y).hit === true){
+            this.randomAttack(playerGameboard);
+        } else {
+            this.attack(x, y, playerGameboard.gameboard);
+        }
     }
 
     //todo: implement random ship placement
@@ -170,16 +240,20 @@ class Computer extends Player {
 
 let player = new Player('Player 1');
 player.populateShipList();
-player.printShips();
-
-let computer = new Computer('Computer');
-computer.populateShipList();
-computer.printShips();
+// player.printShips();
 
 
-// let gameboard = new Gameboard();
-//
-// gameboard.createGameboard();
+
+// let computer = new Computer('Computer');
+// computer.populateShipList();
+// computer.printShips();
+
+
+let gameboard = new Gameboard();
+
+gameboard.createGameboard();
+console.log(player.shipList[1])
+console.log(gameboard.isOrientationValid(9,'A',player.shipList[1],'Horizontal'))
 // gameboard.printNodes();
 
 module.exports = {Node, Ship, Gameboard, Player, Computer};
