@@ -26,7 +26,7 @@ test('set ship', () => {
 test('ship hit', () => {
     let testBoard = new Gameboard();
     testBoard.createGameboard();
-    testBoard.addShip(1, 'A', 5, 'Carrier');
+    testBoard.addShipToNode(1, 'A', 5, 'Carrier');
     testBoard.recieveAttack(1, 'A');
     expect(testBoard.findNodeInList(1, 'A').hit).toBe(true);
 
@@ -53,4 +53,38 @@ test('Cell validity check pass',()=>{
     testBoard.createGameboard()
    expect( testBoard.isCellValid(1,'A')).toBe(true)
 
+})
+
+test('Vertical Orientation Check pass',()=>{
+
+let player = new Player('Player 1');
+player.populateShipList();
+let gameboard = new Gameboard();
+gameboard.createGameboard();
+expect(gameboard.isOrientationValid(10, 'E', player.shipList[0], 'Vertical')).toBe(true)
+})
+
+test('Vertical Orientation Check fail',()=>{
+
+let player = new Player('Player 1');
+player.populateShipList();
+let gameboard = new Gameboard();
+gameboard.createGameboard();
+expect(gameboard.isOrientationValid(10, 'J', player.shipList[0], 'Vertical')).toBe(false)
+})
+test('Horizontal Orientation Check fail',()=>{
+
+let player = new Player('Player 1');
+player.populateShipList();
+let gameboard = new Gameboard();
+gameboard.createGameboard();
+expect(gameboard.isOrientationValid(10, 'J', player.shipList[0], 'Horizontal')).toBe(false)
+})
+test('Horizontal Orientation Check pass',()=>{
+
+let player = new Player('Player 1');
+player.populateShipList();
+let gameboard = new Gameboard();
+gameboard.createGameboard();
+expect(gameboard.isOrientationValid(1, 'J', player.shipList[0], 'Horizontal')).toBe(true)
 })
