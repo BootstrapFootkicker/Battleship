@@ -193,7 +193,7 @@ class Gameboard {
         return node;
     }
 
-    recieveAttack(x, y) {
+    receiveAttack(x, y) {
         if (this.findNodeInList(x, y) === null) {
             return null;
         }

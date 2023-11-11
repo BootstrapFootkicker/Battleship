@@ -27,7 +27,7 @@ test('ship hit', () => {
     let testBoard = new Gameboard();
     testBoard.createGameboard();
     testBoard.addShipToNode(1, 'A', 5, 'Carrier');
-    testBoard.recieveAttack(1, 'A');
+    testBoard.receiveAttack(1, 'A');
     expect(testBoard.findNodeInList(1, 'A').hit).toBe(true);
 
 });
