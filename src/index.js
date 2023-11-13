@@ -1,4 +1,4 @@
-//import './style.css'
+import './style.css'
 
 class Node {
     constructor(x, y) {
@@ -20,6 +20,10 @@ class Node {
         return this.hasShip;
     }
 
+    isHit() {
+        return this.hit;
+    }
+
 
 }
 
@@ -37,13 +41,12 @@ class Ship {
     getOrientation() {
         return this.orientation;
     }
+
     getShipType() {
         return this.type;
     }
 
-    getShipCoords(){
-        return this.shipCoords
-    }
+
     hit() {
         this.numOfHits++;
         if (this.numOfHits === this.length) {
@@ -59,9 +62,6 @@ class Ship {
         this.orientation = orientation;
     }
 
-    getOrientation() {
-        return this.orientation;
-    }
 
     getOwner() {
         return this.owner;
@@ -104,11 +104,7 @@ class Gameboard {
     isCellValid(x, y) {
         if (this.findNodeInList(x, y) === null) {
             return false
-        } else if (this.findNodeInList(x, y).hasShip === true) {
-            return false
-        } else {
-            return true
-        }
+        } else return this.findNodeInList(x, y).hasShip !== true;
     }
 
     isOrientationValid(x, y, ship, orientation) {
@@ -151,7 +147,7 @@ class Gameboard {
             this.addShipToNode(coord.x, coord.y, ship)
         });
         this.addShipToList(ship)
-        return
+
     }
 
     setHorizontalCoords(x, y, ship) {
@@ -168,7 +164,7 @@ class Gameboard {
         });
 
         this.addShipToList(ship)
-        return
+
     }
 
     addNode(x, y) {
@@ -176,10 +172,6 @@ class Gameboard {
         this.nodeList.push(node);
     }
 
-    addEdge(node1, node2) {
-        node1.edges.push(node2);
-        node2.edges.push(node1);
-    }
 
     addShipToNode(x, y, ship) {
 
@@ -233,17 +225,15 @@ class Player {
     }
 
     findShip(shipType) {
-        let ship = this.shipList.find((ship) => {
+        return this.shipList.find((ship) => {
             return ship.type === shipType;
         });
-        return ship;
     }
 
     findShipIndex(shipType) {
-        let ship = this.shipList.findIndex((ship) => {
+        return this.shipList.findIndex((ship) => {
             return ship.type === shipType;
         });
-        return ship;
     }
 
     getPlayerName() {
@@ -293,7 +283,7 @@ class Player {
             let index = this.findShipIndex(ship.type)
 
             this.shipList.splice(index, 1)
-                        console.log(`Ship ${ship.getShipType()} placed at ${x},${y}`)
+            console.log(`Ship ${ship.getShipType()} placed at ${x},${y}`)
 
 
         } else {
@@ -310,6 +300,7 @@ class Computer extends Player {
         super();
         this.name = name;
         this.gameboard = new Gameboard();
+        this.coordsAttacked = []
     }
 
     createRandomCoords() {
@@ -323,8 +314,7 @@ class Computer extends Player {
 
     createRandomOrientation() {
         let orientations = ['Horizontal', 'Vertical'];
-        let orientation = orientations[Math.floor(Math.random() * 2)];
-        return orientation
+        return orientations[Math.floor(Math.random() * 2)]
     }
 
     randomShipPlacement() {
@@ -334,7 +324,7 @@ class Computer extends Player {
         let x = randomCoords[0]
         let y = randomCoords[1]
 
-        while (this.shipList.length != 0) {
+        while (this.shipList.length !== 0) {
             let ship = this.shipList[0]
             this.placeShip(x, y, ship, orientation)
             randomCoords = this.createRandomCoords()
@@ -347,41 +337,68 @@ class Computer extends Player {
     }
 
     randomAttack(playerGameboard) {
-        let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        let x = Math.floor(Math.random() * 10) + 1;
-        let y = alphabet[Math.floor(Math.random() * 10)];
+        let hitValid = false
+        while (hitValid === false) {
+            let randomCoords = this.createRandomCoords()
+            let x = randomCoords[0]
+            let y = randomCoords[1]
 
-        if (playerGameboard.gameboard.findNodeInList(x, y).hit === true) {
-            this.randomAttack(playerGameboard);
-        } else {
-            this.attack(x, y, playerGameboard.gameboard);
+            if (playerGameboard.findNodeInList(x, y).isHit() === false && this.coordsAttacked.includes(`${x},${y}`) === false) {
+                hitValid = true
+                playerGameboard.receiveAttack(x, y)
+                this.coordsAttacked.push(`${x},${y}`)
+                console.log(`Computer attacked ${x},${y}`)
+
+            } else {
+                console.log(`Computer already attacked ${x},${y}`)
+                console.log(playerGameboard.findNodeInList(x, y).isHit())
+            }
+
         }
+
+
     }
 
 
-    //todo: implement random attack
-
 }
 
-let player = new Player('Player 1');
-player.populateShipList();
+class Domcontroller {
+    createGameboard() {
+        let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        let gameboardCellContainer = document.querySelector('.gameBoard-cells-container')
+        let xCoordCell = document.createElement('div')
+        // xCoordCell.classList.add('gameBoard-cell')
+        gameboardCellContainer.appendChild(xCoordCell)
+        for (let i = 0; i < 10; i++) {
+            xCoordCell = document.createElement('div')
+            xCoordCell.classList.add('gameBoard-cell')
+            xCoordCell.innerHTML = (i + 1).toString();
+            gameboardCellContainer.appendChild(xCoordCell)
+        }
+        for (let i = 0; i < 10; i++) {
+            let yCoordCell = document.createElement('div')
+            yCoordCell.classList.add('gameBoard-cell')
+            yCoordCell.innerHTML = alphabet[i];
+            gameboardCellContainer.appendChild(yCoordCell)
+            for (let j = 0; j < 10; j++) {
+                let cell = document.createElement('div')
+                cell.classList.add('gameBoard-cell')
+                cell.id = `${i + 1},${alphabet[j]}`
+                gameboardCellContainer.appendChild(cell)
+            }
+        }
+    }
 
+    createGameBoardCellList()
+    {
 
+    }
+}
 
+let domController = new Domcontroller()
+domController.createGameboard()
 
-
-player.gameboard.createGameboard()
-
-let computer = new Computer('Computer');
-computer.populateShipList();
-computer.gameboard.createGameboard();
-console.log(computer.gameboard.shipList.length)
-computer.randomShipPlacement();
-
-console.log(computer.gameboard.shipList.length)
-
-computer.gameboard.printShipList()
 module.exports = {Node, Ship, Gameboard, Player, Computer};
 
 
-//todo add has ship to coords and connect coords to ship
+
