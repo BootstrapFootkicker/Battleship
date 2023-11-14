@@ -362,20 +362,29 @@ class Computer extends Player {
 
 }
 
-class Domcontroller {
+class DomController {
 
-    createGameboard() {
+    //style doesn't apply to second gameboard if player is created first
+    createGameboard(user) {
         let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        let gameboardCellContainer = document.querySelector('.gameBoard-cells-container')
+        let gameboardCellContainer = document.createElement('div')
+        if (user === 'player') {
+            gameboardCellContainer = document.querySelector('.player-gameBoard-cells')
+        } else if (user === 'computer') {
+            gameboardCellContainer = document.querySelector('.computer-gameBoard-cells')
+
+        }
         let xCoordCell = document.createElement('div')
         // xCoordCell.classList.add('gameBoard-cell')
         gameboardCellContainer.appendChild(xCoordCell)
+
         for (let i = 0; i < 10; i++) {
             xCoordCell = document.createElement('div')
             xCoordCell.classList.add('gameBoard-cell')
             xCoordCell.innerHTML = (i + 1).toString();
             gameboardCellContainer.appendChild(xCoordCell)
         }
+
         for (let i = 0; i < 10; i++) {
             let yCoordCell = document.createElement('div')
             yCoordCell.classList.add('gameBoard-cell')
@@ -390,54 +399,41 @@ class Domcontroller {
         }
 
         const gameBoardCells = document.querySelectorAll('.gameBoard-cell')
-        console.log(gameBoardCells)
-        for(let i =11 ; i<120;i++)
-        {
+        for (let i = 11; i < 120; i++) {
 
             //gameBoardCells[i].classList.remove('gameBoard-cell')
-            if(i===11)
-            {
+            if (i === 11) {
                 gameBoardCells[i].classList.add('topLeftCornerCell')
-            }
-            else if (i===20)
-            {
+            } else if (i === 20) {
                 gameBoardCells[i].classList.add('topRightCornerCell')
-            }
-            else if(i<21 && i>11){
-                  gameBoardCells[i].classList.add('topCell')
-            }
-            else if(i===31 || i===42 || i===53 || i===64 || i===75 || i===86 || i===97 || i===108)
-            {
+            } else if (i < 21 && i > 11) {
+                gameBoardCells[i].classList.add('topCell')
+            } else if (i === 31 || i === 42 || i === 53 || i === 64 || i === 75 || i === 86 || i === 97 || i === 108) {
 
                 gameBoardCells[i].classList.add('rightCell')
-            }
-
-            else if (i===110)
-            {
+            } else if (i === 110) {
                 gameBoardCells[i].classList.add('bottomLeftCornerCell')
-            }
-            else if (i%11==0 && i<110)
-            {
+            } else if (i % 11 === 0 && i < 110) {
                 gameBoardCells[i].classList.add('leftCell')
-            }
-            else if(i>109 && i<120)
-            {
+            } else if (i > 109 && i < 120) {
                 gameBoardCells[i].classList.add('bottomCell')
             }
-
 
 
         }
     }
 
-    createGameBoardCellList()
-    {
-
+    addShipToDom(ship) {
+    //todo add ship to dom
+        //todo add a way to see which game board to add to
     }
 }
 
-let domController = new Domcontroller()
-domController.createGameboard()
+
+let domController = new DomController()
+
+domController.createGameboard('computer')
+domController.createGameboard('player')
 
 module.exports = {Node, Ship, Gameboard, Player, Computer};
 

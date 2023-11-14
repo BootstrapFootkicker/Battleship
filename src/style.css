@@ -6,7 +6,7 @@ body {
     padding: 50px;
 }
 
-.gameBoard-cells-container {
+.player-gameBoard-cells,.computer-gameBoard-cells {
     display: grid;
     grid-template-columns: repeat(11, 50px);
     grid-template-rows: repeat(11, 50px);
@@ -14,6 +14,11 @@ body {
 
 }
 
+.gameBoard-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 
 .gameBoard-cell {
     display: flex;
@@ -28,14 +33,12 @@ body {
 
 .topCell {
 
-    border: 1px solid;
     border-color: black black grey grey;
     border-width: 4px 1px 1px 1px;
 }
 
 .topRightCornerCell {
 
-    border: 1px solid;
     border-color: black black grey grey;
     border-width: 4px 4px 1px 1px;
 
@@ -43,7 +46,6 @@ body {
 
 .topLeftCornerCell {
 
-    border: 1px solid;
     border-color: black grey grey black;
     border-width: 4px 1px 1px 4px;
 
@@ -51,7 +53,6 @@ body {
 
 .leftCell {
 
-    border: 1px solid;
     border-color: grey grey grey black;
     border-width: 1px 1px 1px 4px;
 
@@ -59,7 +60,6 @@ body {
 
 .rightCell {
 
-    border: 1px solid;
     border-color: grey black grey grey;
     border-width: 1px 4px 1px 1px;
 
@@ -67,7 +67,6 @@ body {
 
 .bottomCell {
 
-    border: 1px solid;
     border-color: grey black black grey;
     border-width: 1px 4px 4px 1px;
 
@@ -75,7 +74,6 @@ body {
 
 .bottomLeftCornerCell
 {
-    border: 1px solid;
     border-color: grey grey black black;
     border-width: 1px 1px 4px 4px;
 
