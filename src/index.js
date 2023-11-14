@@ -363,6 +363,7 @@ class Computer extends Player {
 }
 
 class Domcontroller {
+
     createGameboard() {
         let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         let gameboardCellContainer = document.querySelector('.gameBoard-cells-container')
@@ -386,6 +387,46 @@ class Domcontroller {
                 cell.id = `${i + 1},${alphabet[j]}`
                 gameboardCellContainer.appendChild(cell)
             }
+        }
+
+        const gameBoardCells = document.querySelectorAll('.gameBoard-cell')
+        console.log(gameBoardCells)
+        for(let i =11 ; i<120;i++)
+        {
+
+            //gameBoardCells[i].classList.remove('gameBoard-cell')
+            if(i===11)
+            {
+                gameBoardCells[i].classList.add('topLeftCornerCell')
+            }
+            else if (i===20)
+            {
+                gameBoardCells[i].classList.add('topRightCornerCell')
+            }
+            else if(i<21 && i>11){
+                  gameBoardCells[i].classList.add('topCell')
+            }
+            else if(i===31 || i===42 || i===53 || i===64 || i===75 || i===86 || i===97 || i===108)
+            {
+
+                gameBoardCells[i].classList.add('rightCell')
+            }
+
+            else if (i===110)
+            {
+                gameBoardCells[i].classList.add('bottomLeftCornerCell')
+            }
+            else if (i%11==0 && i<110)
+            {
+                gameBoardCells[i].classList.add('leftCell')
+            }
+            else if(i>109 && i<120)
+            {
+                gameBoardCells[i].classList.add('bottomCell')
+            }
+
+
+
         }
     }
 

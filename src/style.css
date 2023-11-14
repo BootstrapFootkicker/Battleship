@@ -10,16 +10,73 @@ body {
     display: grid;
     grid-template-columns: repeat(11, 50px);
     grid-template-rows: repeat(11, 50px);
-    grid-gap: 1px;
+
 
 }
 
 
-
 .gameBoard-cell {
+    display: flex;
     border: 1px solid grey;
     height: 50px;
     width: 50px;
     background-color: white;
     color: black;
+    justify-content: center;
+    align-items: center;
+}
+
+.topCell {
+
+    border: 1px solid;
+    border-color: black black grey grey;
+    border-width: 4px 1px 1px 1px;
+}
+
+.topRightCornerCell {
+
+    border: 1px solid;
+    border-color: black black grey grey;
+    border-width: 4px 4px 1px 1px;
+
+}
+
+.topLeftCornerCell {
+
+    border: 1px solid;
+    border-color: black grey grey black;
+    border-width: 4px 1px 1px 4px;
+
+}
+
+.leftCell {
+
+    border: 1px solid;
+    border-color: grey grey grey black;
+    border-width: 1px 1px 1px 4px;
+
+}
+
+.rightCell {
+
+    border: 1px solid;
+    border-color: grey black grey grey;
+    border-width: 1px 4px 1px 1px;
+
+}
+
+.bottomCell {
+
+    border: 1px solid;
+    border-color: grey black black grey;
+    border-width: 1px 4px 4px 1px;
+
+}
+
+.bottomLeftCornerCell
+{
+    border: 1px solid;
+    border-color: grey grey black black;
+    border-width: 1px 1px 4px 4px;
+
 }
