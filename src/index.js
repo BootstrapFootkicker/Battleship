@@ -374,6 +374,7 @@ class DomController {
             gameboardCellContainer = document.querySelector('.computer-gameBoard-cells')
 
         }
+
         let xCoordCell = document.createElement('div')
         // xCoordCell.classList.add('gameBoard-cell')
         gameboardCellContainer.appendChild(xCoordCell)
@@ -390,13 +391,23 @@ class DomController {
             yCoordCell.classList.add('gameBoard-cell')
             yCoordCell.innerHTML = alphabet[i];
             gameboardCellContainer.appendChild(yCoordCell)
+
             for (let j = 0; j < 10; j++) {
+
                 let cell = document.createElement('div')
                 cell.classList.add('gameBoard-cell')
-                cell.id = `${i + 1},${alphabet[j]}`
+                cell.setAttribute('id', `${alphabet[i]}${j + 1}`)
+                //todo add event listener to each cell
+
+                // cell.addEventListener('ondragover', (e) => {
+                //    // e.preventDefault()
+                //     console.log('dragover')
+                // });
+
                 gameboardCellContainer.appendChild(cell)
             }
         }
+
 
         const gameBoardCells = document.querySelectorAll('.gameBoard-cell')
         for (let i = 11; i < 120; i++) {
@@ -424,7 +435,7 @@ class DomController {
     }
 
     addShipToDom(ship) {
-    //todo add ship to dom
+        //todo add ship to dom
         //todo add a way to see which game board to add to
     }
 }
@@ -435,6 +446,29 @@ let domController = new DomController()
 domController.createGameboard('computer')
 domController.createGameboard('player')
 
+let shipCells = document.querySelectorAll('.ship-cell')
+let shipSelectorDiv = document.querySelector('.ship-selector-container')
+
+shipCells.forEach((cell) => {
+    cell.addEventListener('click', (e) => {
+        if (shipSelectorDiv.style.flexDirection === 'column') {
+            shipSelectorDiv.style.flexDirection = 'row'
+        } else {
+            shipSelectorDiv.style.flexDirection = 'column'
+        }
+        //todo consider div size when adding ships, maybe look to identifying on ship cells on dragover
+        //todo make this effect orientation of the ship node
+    });
+});
+
+// shipSelectorDiv.addEventListener('click', (e) => {
+//     if (shipSelectorDiv.style.flexDirection === 'column') {
+//         shipSelectorDiv.style.flexDirection = 'row'
+//     } else {
+//         shipSelectorDiv.style.flexDirection = 'column'
+//     }
+//     //todo make this effect orientation of the ship node
+// });
 module.exports = {Node, Ship, Gameboard, Player, Computer};
 
 
