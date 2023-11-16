@@ -381,14 +381,14 @@ class DomController {
 
         for (let i = 0; i < 10; i++) {
             xCoordCell = document.createElement('div')
-            xCoordCell.classList.add('gameBoard-cell')
+            xCoordCell.classList.add('x-coord')
             xCoordCell.innerHTML = (i + 1).toString();
             gameboardCellContainer.appendChild(xCoordCell)
         }
 
         for (let i = 0; i < 10; i++) {
             let yCoordCell = document.createElement('div')
-            yCoordCell.classList.add('gameBoard-cell')
+            yCoordCell.classList.add('y-coord')
             yCoordCell.innerHTML = alphabet[i];
             gameboardCellContainer.appendChild(yCoordCell)
 
@@ -399,39 +399,57 @@ class DomController {
                 cell.setAttribute('id', `${alphabet[i]}${j + 1}`)
                 //todo add event listener to each cell
 
-                // cell.addEventListener('ondragover', (e) => {
-                //    // e.preventDefault()
-                //     console.log('dragover')
-                // });
-
                 gameboardCellContainer.appendChild(cell)
             }
         }
 
 
         const gameBoardCells = document.querySelectorAll('.gameBoard-cell')
-        for (let i = 11; i < 120; i++) {
-
-            //gameBoardCells[i].classList.remove('gameBoard-cell')
-            if (i === 11) {
+        for (let i = 0; i < 100; i++) {
+            if (i === 0) {
                 gameBoardCells[i].classList.add('topLeftCornerCell')
-            } else if (i === 20) {
-                gameBoardCells[i].classList.add('topRightCornerCell')
-            } else if (i < 21 && i > 11) {
+            } else if (i < 9 && i > 0) {
                 gameBoardCells[i].classList.add('topCell')
-            } else if (i === 31 || i === 42 || i === 53 || i === 64 || i === 75 || i === 86 || i === 97 || i === 108) {
-
-                gameBoardCells[i].classList.add('rightCell')
-            } else if (i === 110) {
-                gameBoardCells[i].classList.add('bottomLeftCornerCell')
-            } else if (i % 11 === 0 && i < 110) {
+            } else if (i === 9) {
+                gameBoardCells[i].classList.add('topRightCornerCell')
+            } else if (i % 10 === 0 && i < 90) {
                 gameBoardCells[i].classList.add('leftCell')
-            } else if (i > 109 && i < 120) {
+            } else if (i === 19 || i === 29 || i === 39 || i === 49 || i === 59 || i === 69 || i === 79 || i === 89) {
+                gameBoardCells[i].classList.add('rightCell')
+
+            } else if (i === 90) {
+                gameBoardCells[i].classList.add('bottomLeftCornerCell')
+            } else if (i === 91 || i === 92 || i === 93 || i === 94 || i === 95 || i === 96 || i === 97 || i === 98) {
                 gameBoardCells[i].classList.add('bottomCell')
+            } else if (i > 90 && i < 99) {
+                gameBoardCells[i].classList.add('bottomCell')
+            } else if (i === 99) {
+                gameBoardCells[i].classList.add('bottomRightCornerCell')
             }
-
-
         }
+
+    }
+
+    addPlayerBoardListeners() {
+        let playerGameboardCells = document.querySelectorAll('.player-gameBoard-cells .gameBoard-cell')
+        console.log(playerGameboardCells)
+        playerGameboardCells.forEach((cell) => {
+            cell.addEventListener('dragover', (e) => {
+                e.preventDefault()
+                console.log(e.target.id)
+                e.target.style.backgroundColor = 'red'
+            })
+            cell.addEventListener('drop', (e) => {
+                e.preventDefault()
+                console.log(e.target.id)
+            })
+
+            cell.addEventListener('dragleave', (e) => {
+                e.preventDefault()
+                e.target.style.backgroundColor = 'white'
+            });
+            //clicking on drag cell backgroun remains red
+        })
     }
 
     addShipToDom(ship) {
@@ -441,10 +459,12 @@ class DomController {
 }
 
 
-let domController = new DomController()
+let
+    domController = new DomController()
 
 domController.createGameboard('computer')
 domController.createGameboard('player')
+domController.addPlayerBoardListeners()
 
 let shipCells = document.querySelectorAll('.ship-cell')
 let shipSelectorDiv = document.querySelector('.ship-selector-container')
@@ -456,10 +476,12 @@ shipCells.forEach((cell) => {
         } else {
             shipSelectorDiv.style.flexDirection = 'column'
         }
-        //todo consider div size when adding ships, maybe look to identifying on ship cells on dragover
-        //todo make this effect orientation of the ship node
-    });
-});
+//todo consider div size when adding ships, maybe look to identifying on ship cells on dragover
+//todo make this effect orientation of the ship node
+    })
+    ;
+})
+;
 
 // shipSelectorDiv.addEventListener('click', (e) => {
 //     if (shipSelectorDiv.style.flexDirection === 'column') {

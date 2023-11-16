@@ -23,7 +23,7 @@ body {
     justify-content: space-between;
 }
 
-.gameBoard-cell {
+.gameBoard-cell,.x-coord,.y-coord {
     display: flex;
     border: 1px solid grey;
     height: 50px;
@@ -92,5 +92,11 @@ body {
 .bottomLeftCornerCell {
     border-color: grey grey black black;
     border-width: 1px 1px 4px 4px;
+
+}
+
+.bottomRightCornerCell{
+    border-color: grey black black grey;
+    border-width: 1px 4px 4px 1px;
 
 }
