@@ -34,7 +34,7 @@ class Ship {
         this.isSunk = false;
         this.numOfHits = 0;
         this.owner = owner;
-        this.orientation = null;
+        this.orientation = "Horizontal";
         this.shipCoords = []
     }
 
@@ -204,6 +204,7 @@ class Gameboard {
     receiveAttack(x, y) {
         if (this.findNodeInList(x, y) === null) {
             return null;
+            id
         }
         let node = this.findNodeInList(x, y);
         if (node.hasShip) {
@@ -318,7 +319,6 @@ class Computer extends Player {
     }
 
     randomShipPlacement() {
-        //todo implement random ship placement
         let randomCoords = this.createRandomCoords()
         let orientation = this.createRandomOrientation()
         let x = randomCoords[0]
@@ -332,7 +332,17 @@ class Computer extends Player {
             x = randomCoords[0]
             y = randomCoords[1]
         }
-
+        let computerGameboardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
+        let shipList = this.gameboard.shipList
+        shipList.forEach((ship) => {
+            ship.shipCoords.forEach((coord) => {
+                computerGameboardCells.forEach((cell) => {
+                    if (cell.id === `${coord.y}${coord.x}`) {
+                        cell.classList.add('ship-cell')
+                    }
+                });
+            })
+        });
 
     }
 
@@ -430,67 +440,99 @@ class DomController {
 
     }
 
-    addPlayerBoardListeners() {
+
+    addPlayerBoardListeners(player) {
         let playerGameboardCells = document.querySelectorAll('.player-gameBoard-cells .gameBoard-cell')
         console.log(playerGameboardCells)
         playerGameboardCells.forEach((cell) => {
             cell.addEventListener('dragover', (e) => {
                 e.preventDefault()
                 console.log(e.target.id)
-                e.target.style.backgroundColor = 'red'
+                e.target.classList.add('dragging')
+                // e.target.style.backgroundColor = 'red'
             })
             cell.addEventListener('drop', (e) => {
                 e.preventDefault()
+                e.target.classList.remove('dragging')
                 console.log(e.target.id)
+                let currentShip = document.querySelector('.ship-selector-container .ship-cell')
+                let shipType = currentShip.id.slice(0, -1)
+                let ship = player.findShip(shipType);
+                console.log(ship)
+                let x = parseInt(e.target.id.slice(1))
+                console.log(x)
+                let y = e.target.id.slice(0, 1)
+                console.log(y)
+                let orientation = ship.getOrientation()
+                player.placeShip(x, y, ship, orientation)
+
+                let shipCoords = ship.getShipCoords()
+                shipCoords.forEach((coord) => {
+                    let cell = document.getElementById(`${coord.y}${coord.x}`)
+                    cell.classList.add('ship-cell')
+                });
+
+
             })
 
             cell.addEventListener('dragleave', (e) => {
                 e.preventDefault()
-                e.target.style.backgroundColor = 'white'
+                e.target.classList.remove('dragging')
+                //e.target.style.backgroundColor = 'white'
             });
             //clicking on drag cell backgroun remains red
         })
     }
 
-    addShipToDom(ship) {
-        //todo add ship to dom
-        //todo add a way to see which game board to add to
+
+    cycleShip(ship) {
+        let shipSelectorContainer = document.querySelector('.ship-selector-container')
+        for (let i = 0; i < ship.length; i++) {
+            console.log(ship.length)
+            let shipCell = document.createElement('div')
+            shipCell.classList.add('ship-cell')
+            //shipCell.setAttribute('draggable', 'true')
+            shipCell.setAttribute('id', `${ship.type}${i}`)
+            shipSelectorContainer.appendChild(shipCell)
+        }
+
+        let shipCells = document.querySelectorAll('.ship-cell')
+        let shipSelectorDiv = document.querySelector('.ship-selector-container')
+
+        shipCells.forEach((cell) => {
+            cell.addEventListener('click', (e) => {
+                if (shipSelectorDiv.style.flexDirection === 'column') {
+                    shipSelectorDiv.style.flexDirection = 'row'
+                    ship.setOrientation('Horizontal')
+                } else {
+                    shipSelectorDiv.style.flexDirection = 'column'
+                    ship.setOrientation('Vertical')
+                }
+            })
+            ;
+        })
+        ;
     }
+
 }
 
 
-let
-    domController = new DomController()
+let domController = new DomController()
+let player = new Player('Player')
+player.populateShipList()
 
 domController.createGameboard('computer')
 domController.createGameboard('player')
-domController.addPlayerBoardListeners()
+player.gameboard.createGameboard()
+domController.addPlayerBoardListeners(player)
 
-let shipCells = document.querySelectorAll('.ship-cell')
-let shipSelectorDiv = document.querySelector('.ship-selector-container')
+let computer = new Computer('Computer')
+computer.populateShipList()
+computer.gameboard.createGameboard()
+computer.randomShipPlacement()
 
-shipCells.forEach((cell) => {
-    cell.addEventListener('click', (e) => {
-        if (shipSelectorDiv.style.flexDirection === 'column') {
-            shipSelectorDiv.style.flexDirection = 'row'
-        } else {
-            shipSelectorDiv.style.flexDirection = 'column'
-        }
-//todo consider div size when adding ships, maybe look to identifying on ship cells on dragover
-//todo make this effect orientation of the ship node
-    })
-    ;
-})
-;
+domController.cycleShip(player.findShip('Carrier'))
 
-// shipSelectorDiv.addEventListener('click', (e) => {
-//     if (shipSelectorDiv.style.flexDirection === 'column') {
-//         shipSelectorDiv.style.flexDirection = 'row'
-//     } else {
-//         shipSelectorDiv.style.flexDirection = 'column'
-//     }
-//     //todo make this effect orientation of the ship node
-// });
 module.exports = {Node, Ship, Gameboard, Player, Computer};
 
 

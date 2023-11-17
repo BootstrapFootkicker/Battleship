@@ -34,6 +34,11 @@ body {
     align-items: center;
 }
 
+
+.dragging {
+     background-color: #000000;
+    color: white;
+}
 .ship-selector-container{
         display: flex;
     outline: red solid 1px;
