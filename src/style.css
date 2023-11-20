@@ -9,7 +9,13 @@ body {
     gap: 20px;
 }
 
+/*.player-gameBoard-cells {*/
+/*    position: relative;*/
+
+/*}*/
+
 .player-gameBoard-cells, .computer-gameBoard-cells {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(11, 50px);
     grid-template-rows: repeat(11, 50px);
@@ -23,7 +29,7 @@ body {
     justify-content: space-between;
 }
 
-.gameBoard-cell,.x-coord,.y-coord {
+.gameBoard-cell, .x-coord, .y-coord {
     display: flex;
     border: 1px solid grey;
     height: 50px;
@@ -34,17 +40,43 @@ body {
     align-items: center;
 }
 
+.overlay {
+    position: absolute; /* Sit on top of the page content */
+    display: flex; /* Hidden by default */
+    left: 25px;
+    top: 15px;
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+    align-items: center;
+}
 
-.dragging {
-     background-color: #000000;
+.startButton {
+    height: 50px;
+    width: 200px;
+
+}
+
+.hit {
+    background-color: red;
     color: white;
 }
-.ship-selector-container{
-        display: flex;
+
+.dragging {
+    background-color: #000000;
+    color: white;
+}
+
+.ship-selector-container {
+    display: flex;
     outline: red solid 1px;
 
     /*flex-direction: column;*/
 }
+
 .ship-cell {
     background-color: #000000;
     border: 1px solid grey;
@@ -100,7 +132,7 @@ body {
 
 }
 
-.bottomRightCornerCell{
+.bottomRightCornerCell {
     border-color: grey black black grey;
     border-width: 1px 4px 4px 1px;
 

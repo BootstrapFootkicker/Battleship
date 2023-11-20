@@ -204,7 +204,6 @@ class Gameboard {
     receiveAttack(x, y) {
         if (this.findNodeInList(x, y) === null) {
             return null;
-            id
         }
         let node = this.findNodeInList(x, y);
         if (node.hasShip) {
@@ -374,6 +373,32 @@ class Computer extends Player {
 
 class DomController {
 
+
+    addShipToSelector(ship) {
+
+        let shipSelectorContainer = document.querySelector('.ship-selector-container')
+
+        shipSelectorContainer.innerHTML = ''
+        shipSelectorContainer.style.flexDirection = 'row'
+        ship.setOrientation('Horizontal')
+
+        for (let i = 0; i < ship.length; i++) {
+            let shipCell = document.createElement('div')
+            shipCell.addEventListener('click', (e) => {
+                if (shipSelectorContainer.style.flexDirection === 'column') {
+                    shipSelectorContainer.style.flexDirection = 'row'
+                    ship.setOrientation('Horizontal')
+                } else {
+                    shipSelectorContainer.style.flexDirection = 'column'
+                    ship.setOrientation('Vertical')
+                }
+            });
+            shipCell.classList.add('ship-cell')
+            shipCell.setAttribute('id', `${ship.type}${i}`)
+            shipSelectorContainer.appendChild(shipCell)
+        }
+    }
+
     //style doesn't apply to second gameboard if player is created first
     createGameboard(user) {
         let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -471,6 +496,14 @@ class DomController {
                     let cell = document.getElementById(`${coord.y}${coord.x}`)
                     cell.classList.add('ship-cell')
                 });
+                if (player.shipList.length !== 0) {
+                    this.addShipToSelector(player.shipList[0])
+                } else {
+                    let shipSelectorContainer = document.querySelector('.ship-selector-container')
+                    let computerOverlay = document.querySelector('.computer-overlay')
+                    computerOverlay.style.display = 'none'
+                    shipSelectorContainer.innerHTML = ''
+                }
 
 
             })
@@ -485,53 +518,44 @@ class DomController {
     }
 
 
-    cycleShip(ship) {
-        let shipSelectorContainer = document.querySelector('.ship-selector-container')
-        for (let i = 0; i < ship.length; i++) {
-            console.log(ship.length)
-            let shipCell = document.createElement('div')
-            shipCell.classList.add('ship-cell')
-            //shipCell.setAttribute('draggable', 'true')
-            shipCell.setAttribute('id', `${ship.type}${i}`)
-            shipSelectorContainer.appendChild(shipCell)
-        }
+}
 
-        let shipCells = document.querySelectorAll('.ship-cell')
-        let shipSelectorDiv = document.querySelector('.ship-selector-container')
+class GameLogic {
 
-        shipCells.forEach((cell) => {
-            cell.addEventListener('click', (e) => {
-                if (shipSelectorDiv.style.flexDirection === 'column') {
-                    shipSelectorDiv.style.flexDirection = 'row'
-                    ship.setOrientation('Horizontal')
-                } else {
-                    shipSelectorDiv.style.flexDirection = 'column'
-                    ship.setOrientation('Vertical')
-                }
-            })
-            ;
-        })
-        ;
+    constructor() {
+        this.player = new Player('Player')
+        this.computer = new Computer('Computer')
+        this.domController = new DomController()
+
     }
+
+    gameSetup() {
+        this.player.populateShipList()
+        this.computer.populateShipList()
+        this.domController.createGameboard('computer')
+        this.domController.createGameboard('player')
+        this.player.gameboard.createGameboard()
+        this.computer.gameboard.createGameboard()
+        this.domController.addPlayerBoardListeners(this.player)
+        this.computer.randomShipPlacement()
+        this.domController.addShipToSelector(this.player.shipList[0])
+
+    }
+
+    gameLoop() {
+        this.domController.addShipToSelector(this.player.shipList[0])
+
+    }
+
 
 }
 
 
-let domController = new DomController()
-let player = new Player('Player')
-player.populateShipList()
+let gameLogic = new GameLogic()
+gameLogic.gameSetup()
 
-domController.createGameboard('computer')
-domController.createGameboard('player')
-player.gameboard.createGameboard()
-domController.addPlayerBoardListeners(player)
+//gameLogic.playerShipPlacementPhase()
 
-let computer = new Computer('Computer')
-computer.populateShipList()
-computer.gameboard.createGameboard()
-computer.randomShipPlacement()
-
-domController.cycleShip(player.findShip('Carrier'))
 
 module.exports = {Node, Ship, Gameboard, Player, Computer};
 
