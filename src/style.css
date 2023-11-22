@@ -9,10 +9,14 @@ body {
     gap: 20px;
 }
 
-/*.player-gameBoard-cells {*/
-/*    position: relative;*/
-
-/*}*/
+.hit {
+    background-color: red;
+    color: white;
+}
+.miss {
+    background-color: grey;
+    color: white;
+}
 
 .player-gameBoard-cells, .computer-gameBoard-cells {
     position: relative;

@@ -202,17 +202,24 @@ class Gameboard {
     }
 
     receiveAttack(x, y) {
-        if (this.findNodeInList(x, y) === null) {
+        let node = this.findNodeInList(x, y);
+        let nodeCell = document.getElementById(`${y}${x}`)
+        if (node === null) {
             return null;
         }
-        let node = this.findNodeInList(x, y);
-        if (node.hasShip) {
+
+        if (node.hasShip && node.hit === false) {
             node.hit = true;
             node.ship.hit();
-            return true;
-        } else {
+            return "Hit";
+        } else if (node.hasShip === false && node.hit === false) {
             node.hit = true;
-            return false;
+            return "Miss";
+        } else if (node.hit === true) {
+            return "Already Hit"
+
+        } else {
+            return null;
         }
     }
 }
@@ -247,7 +254,8 @@ class Player {
     }
 
     attack(x, y, enemyGameboard) {
-        enemyGameboard.recieveAttack(x, y);
+        console.log(`Player ${this.name} attacked ${x},${y}`)
+        return enemyGameboard.receiveAttack(x, y);
     }
 
     populateShipList() {
@@ -354,9 +362,18 @@ class Computer extends Player {
 
             if (playerGameboard.findNodeInList(x, y).isHit() === false && this.coordsAttacked.includes(`${x},${y}`) === false) {
                 hitValid = true
-                playerGameboard.receiveAttack(x, y)
+                let result = playerGameboard.receiveAttack(x, y)
                 this.coordsAttacked.push(`${x},${y}`)
                 console.log(`Computer attacked ${x},${y}`)
+                let cell = document.getElementById(`${y}${x}`)
+                if (result === "Hit") {
+                    cell.classList.add('hit')
+                    cell.style.backgroundColor = 'red'
+                } else if (result === "Miss") {
+                    cell.classList.add('miss')
+                    cell.style.backgroundColor = 'grey'
+                }
+
 
             } else {
                 console.log(`Computer already attacked ${x},${y}`)
@@ -513,10 +530,19 @@ class DomController {
                 e.target.classList.remove('dragging')
                 //e.target.style.backgroundColor = 'white'
             });
-            //clicking on drag cell backgroun remains red
+
         })
     }
 
+    showHit(cell) {
+        cell.classList.add('hit')
+        cell.style.backgroundColor = 'red'
+    }
+
+    showMiss(cell) {
+        cell.classList.add('miss')
+        cell.style.backgroundColor = 'grey'
+    }
 
 }
 
@@ -529,6 +555,7 @@ class GameLogic {
 
     }
 
+
     gameSetup() {
         this.player.populateShipList()
         this.computer.populateShipList()
@@ -540,24 +567,48 @@ class GameLogic {
         this.computer.randomShipPlacement()
         this.domController.addShipToSelector(this.player.shipList[0])
 
+        //use this to create  regular game loop
+        let gameInterval = setInterval(() => {
+            if (this.player.shipList.length === 0 && this.computer.shipList.length === 0) {
+                console.log("nextPhase")
+                this.addComputerGameBoardListeners()
+                clearInterval(gameInterval)
+            }
+        }, 1000)
+
     }
 
-    gameLoop() {
-        this.domController.addShipToSelector(this.player.shipList[0])
+    addComputerGameBoardListeners() {
+        let computerGameboardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
+        computerGameboardCells.forEach((cell) => {
+            cell.addEventListener('click', (e) => {
+                let x = parseInt(e.target.id.slice(1))
+                let y = e.target.id.slice(0, 1)
+                let result = this.player.attack(x, y, this.computer.gameboard)
+                if (result === "Hit") {
+                    this.domController.showHit(e.target)
+                    this.computer.randomAttack(this.player.gameboard)
+                } else if (result === "Miss") {
+                    this.domController.showMiss(e.target)
+                    this.computer.randomAttack(this.player.gameboard)
+                }
 
+
+            });
+
+        })
     }
-
-
 }
-
 
 let gameLogic = new GameLogic()
 gameLogic.gameSetup()
 
+
 //gameLogic.playerShipPlacementPhase()
 
 
-module.exports = {Node, Ship, Gameboard, Player, Computer};
+module
+    .exports = {Node, Ship, Gameboard, Player, Computer};
 
 
 
