@@ -7,7 +7,7 @@ class Node {
         this.hit = false;
         this.hasShip = false;
         this.ship = null;
-        this.edges = [];
+
     }
 
     setShip(ship) {
@@ -51,7 +51,9 @@ class Ship {
         this.numOfHits++;
         if (this.numOfHits === this.length) {
             this.isSunk = true;
+            this.owner.remainingShips -= 1
         }
+
     }
 
     isSunk() {
@@ -82,6 +84,12 @@ class Ship {
 
 class Gameboard {
     constructor() {
+        this.nodeList = [];
+        this.shipList = [];
+    }
+
+
+    restartGameBoard() {
         this.nodeList = [];
         this.shipList = [];
     }
@@ -228,7 +236,14 @@ class Player {
     constructor(name) {
         this.name = name;
         this.gameboard = new Gameboard();
+        this.remainingShips = 5;
         this.shipList = [];
+    }
+
+    resetPlayer() {
+        this.gameboard.restartGameBoard()
+        this.shipList = []
+        this.remainingShips = 5
     }
 
     findShip(shipType) {
@@ -253,17 +268,25 @@ class Player {
         });
     }
 
+    getRemainingShips() {
+        return this.remainingShips
+    }
+
     attack(x, y, enemyGameboard) {
         console.log(`Player ${this.name} attacked ${x},${y}`)
         return enemyGameboard.receiveAttack(x, y);
     }
 
     populateShipList() {
-        this.shipList.push(new Ship(5, 'Carrier', this.name));
-        this.shipList.push(new Ship(4, 'Battleship', this.name));
-        this.shipList.push(new Ship(3, 'Destroyer', this.name));
-        this.shipList.push(new Ship(3, 'Submarine', this.name));
-        this.shipList.push(new Ship(2, 'Patrol Boat', this.name));
+        if (this.shipList.length !== 0) {
+            this.shipList = []
+        } else {
+            this.shipList.push(new Ship(5, 'Carrier', this));
+            this.shipList.push(new Ship(4, 'Battleship', this));
+            this.shipList.push(new Ship(3, 'Destroyer', this));
+            this.shipList.push(new Ship(3, 'Submarine', this));
+            this.shipList.push(new Ship(2, 'Patrol Boat', this));
+        }
     }
 
     placeShip(x, y, ship, orientation) {
@@ -311,6 +334,9 @@ class Computer extends Player {
         this.coordsAttacked = []
     }
 
+    restartComputer() {
+        this.coordsAttacked = []
+    }
     createRandomCoords() {
         let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
@@ -390,6 +416,24 @@ class Computer extends Player {
 
 class DomController {
 
+    clearBoard() {
+        let playerCells = document.querySelectorAll('.player-gameBoard-cells .gameBoard-cell')
+        let computerCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
+
+        playerCells.forEach((cell) => {
+            cell.classList.remove('hit')
+            cell.classList.remove('miss')
+            cell.classList.remove('ship-cell')
+            cell.style.backgroundColor = 'white'
+        });
+        computerCells.forEach((cell) => {
+            cell.classList.remove('hit')
+            cell.classList.remove('miss')
+            cell.classList.remove('ship-cell')
+            cell.style.backgroundColor = 'white'
+        });
+
+    }
 
     addShipToSelector(ship) {
 
@@ -416,8 +460,10 @@ class DomController {
         }
     }
 
+
     //style doesn't apply to second gameboard if player is created first
     createGameboard(user) {
+
         let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         let gameboardCellContainer = document.createElement('div')
         if (user === 'player') {
@@ -428,7 +474,7 @@ class DomController {
         }
 
         let xCoordCell = document.createElement('div')
-        // xCoordCell.classList.add('gameBoard-cell')
+
         gameboardCellContainer.appendChild(xCoordCell)
 
         for (let i = 0; i < 10; i++) {
@@ -480,55 +526,75 @@ class DomController {
             }
         }
 
+        if (user === 'computer') {
+            let computerGameBoardCells = document.querySelector('.computer-gameBoard-cells');
+            let computerOverlay = document.createElement('div')
+            computerOverlay.classList.add('computer-overlay')
+            computerOverlay.classList.add('overlay')
+            computerGameBoardCells.appendChild(computerOverlay)
+        }
     }
 
+    cellDragOver(e) {
+        e.preventDefault()
+        console.log(e.target.id)
+        e.target.classList.add('dragging')
+        // e.target.style.backgroundColor = 'red'
+    }
+
+    cellDrop(e, player) {
+        e.preventDefault()
+        e.target.classList.remove('dragging')
+        console.log(e.target.id)
+        let currentShip = document.querySelector('.ship-selector-container .ship-cell')
+        let shipType = currentShip.id.slice(0, -1)
+        let ship = player.findShip(shipType);
+        console.log(ship)
+        let x = parseInt(e.target.id.slice(1))
+        console.log(x)
+        let y = e.target.id.slice(0, 1)
+        console.log(y)
+        let orientation = ship.getOrientation()
+        player.placeShip(x, y, ship, orientation)
+
+        let shipCoords = ship.getShipCoords()
+        shipCoords.forEach((coord) => {
+            let cell = document.getElementById(`${coord.y}${coord.x}`)
+            cell.classList.add('ship-cell')
+        });
+        if (player.shipList.length !== 0) {
+            this.addShipToSelector(player.shipList[0])
+        } else {
+            let shipSelectorContainer = document.querySelector('.ship-selector-container')
+            //  let computerOverlay = document.querySelector('.computer-overlay')
+            // computerOverlay.style.display = 'none'
+            shipSelectorContainer.innerHTML = ''
+        }
+
+
+    }
+
+    dragLeave(e) {
+        e.preventDefault()
+        e.target.classList.remove('dragging')
+        //e.target.style.backgroundColor = 'white'
+    }
 
     addPlayerBoardListeners(player) {
         let playerGameboardCells = document.querySelectorAll('.player-gameBoard-cells .gameBoard-cell')
         console.log(playerGameboardCells)
         playerGameboardCells.forEach((cell) => {
             cell.addEventListener('dragover', (e) => {
-                e.preventDefault()
-                console.log(e.target.id)
-                e.target.classList.add('dragging')
-                // e.target.style.backgroundColor = 'red'
+                this.cellDragOver(e)
             })
+
             cell.addEventListener('drop', (e) => {
-                e.preventDefault()
-                e.target.classList.remove('dragging')
-                console.log(e.target.id)
-                let currentShip = document.querySelector('.ship-selector-container .ship-cell')
-                let shipType = currentShip.id.slice(0, -1)
-                let ship = player.findShip(shipType);
-                console.log(ship)
-                let x = parseInt(e.target.id.slice(1))
-                console.log(x)
-                let y = e.target.id.slice(0, 1)
-                console.log(y)
-                let orientation = ship.getOrientation()
-                player.placeShip(x, y, ship, orientation)
-
-                let shipCoords = ship.getShipCoords()
-                shipCoords.forEach((coord) => {
-                    let cell = document.getElementById(`${coord.y}${coord.x}`)
-                    cell.classList.add('ship-cell')
-                });
-                if (player.shipList.length !== 0) {
-                    this.addShipToSelector(player.shipList[0])
-                } else {
-                    let shipSelectorContainer = document.querySelector('.ship-selector-container')
-                    let computerOverlay = document.querySelector('.computer-overlay')
-                    computerOverlay.style.display = 'none'
-                    shipSelectorContainer.innerHTML = ''
-                }
-
+                this.cellDrop(e, player)
 
             })
 
             cell.addEventListener('dragleave', (e) => {
-                e.preventDefault()
-                e.target.classList.remove('dragging')
-                //e.target.style.backgroundColor = 'white'
+                this.dragLeave(e)
             });
 
         })
@@ -544,6 +610,13 @@ class DomController {
         cell.style.backgroundColor = 'grey'
     }
 
+    toggleComputerOverlayOn() {
+        let computerOverlay = document.querySelector('.computer-overlay')
+
+        computerOverlay.style.display = 'block'
+
+
+    }
 }
 
 class GameLogic {
@@ -552,11 +625,64 @@ class GameLogic {
         this.player = new Player('Player')
         this.computer = new Computer('Computer')
         this.domController = new DomController()
-
+        this.setResetButton()
     }
 
 
+    clearAllIntervals() {
+        for (let i = 1; i < 99999; i++) {
+            window.clearInterval(i);
+        }
+    }
+
+    restartGame() {
+        let playerGameBoardDiv = document.querySelector('.player-gameBoard-cells')
+        let computerGameBoardCellsDiv = document.querySelectorAll('.computer-gameBoard-cells')
+        let shipSelectorContainer = document.querySelector('.ship-selector-container')
+        console.log(computerGameBoardCellsDiv[0])
+        shipSelectorContainer.innerHTML = ''
+        computerGameBoardCellsDiv[0].innerHTML = ''
+        playerGameBoardDiv.innerHTML = ''
+
+        this.clearAllIntervals()
+        this.domController.clearBoard()
+        this.player.resetPlayer()
+        this.computer.resetPlayer()
+        this.computer.restartComputer()
+        this.gameSetup()
+    }
+
+    setResetButton() {
+        let resetButton = document.querySelector('.reset-board')
+        resetButton.addEventListener('click', () => {
+            this.restartGame()
+        });
+
+    }
+
+    isGameOver() {
+        let gameOverInterval = setInterval(() => {
+            if (this.player.getRemainingShips() === 0 || this.computer.getRemainingShips() === 0) {
+                clearInterval(gameOverInterval)
+                return true
+            }
+        }, 1000);
+
+    }
+
+    getWinner() {
+        if (this.player.getRemainingShips() === 0) {
+            return "Computer"
+        } else {
+            return "Player"
+
+        }
+
+    }
+
     gameSetup() {
+
+
         this.player.populateShipList()
         this.computer.populateShipList()
         this.domController.createGameboard('computer')
@@ -576,26 +702,53 @@ class GameLogic {
             }
         }, 1000)
 
+        let gameOverInterval = setInterval(() => {
+            if (this.player.getRemainingShips() === 0 || this.computer.getRemainingShips() === 0) {
+                let winner = this.getWinner()
+                alert(`${winner} wins!`)
+                this.domController.toggleComputerOverlayOn()
+                console.log("game over")
+                clearInterval(gameOverInterval)
+
+            }
+        }, 1000);
+
+
+    }
+
+    clickEvent(e) {
+        let x = parseInt(e.target.id.slice(1))
+        let y = e.target.id.slice(0, 1)
+        let result = this.player.attack(x, y, this.computer.gameboard)
+        if (result === "Hit") {
+            this.domController.showHit(e.target)
+            this.computer.randomAttack(this.player.gameboard)
+        } else if (result === "Miss") {
+            this.domController.showMiss(e.target)
+            this.computer.randomAttack(this.player.gameboard)
+        } else if (result === "Already Hit") {
+            console.log("Already Hit")
+        }
+
     }
 
     addComputerGameBoardListeners() {
         let computerGameboardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
         computerGameboardCells.forEach((cell) => {
             cell.addEventListener('click', (e) => {
-                let x = parseInt(e.target.id.slice(1))
-                let y = e.target.id.slice(0, 1)
-                let result = this.player.attack(x, y, this.computer.gameboard)
-                if (result === "Hit") {
-                    this.domController.showHit(e.target)
-                    this.computer.randomAttack(this.player.gameboard)
-                } else if (result === "Miss") {
-                    this.domController.showMiss(e.target)
-                    this.computer.randomAttack(this.player.gameboard)
-                }
-
-
+                this.clickEvent(e)
             });
 
+        })
+    }
+
+    removeComputerListeners() {
+        let computerGameboardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
+        computerGameboardCells.forEach((cell) => {
+            cell.removeEventListener('click', (e) => {
+                this.clickEvent(e)
+            });
+            console.log("removed")
         })
     }
 }
