@@ -7,12 +7,16 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    align-items: center;
+    justify-content: center;
+
 }
 
 .hit {
     background-color: red;
     color: white;
 }
+
 .miss {
     background-color: grey;
     color: white;
@@ -30,7 +34,9 @@ body {
 .gameBoard-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 120px;
+
 }
 
 .gameBoard-cell, .x-coord, .y-coord {
@@ -43,7 +49,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 
 
 .overlay {
@@ -60,7 +65,7 @@ body {
     align-items: center;
 }
 
-.computer-overlay{
+.computer-overlay {
     display: none;
 }
 
@@ -82,9 +87,22 @@ body {
 
 .ship-selector-container {
     display: flex;
-    outline: red solid 1px;
+    justify-content: center;
+    align-items: center;
+    outline: grey solid 1px;
+    /*todo if changed to column change width to 50 percent for centering*/
 
-    /*flex-direction: column;*/
+}
+
+.controls-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: -30%;
+    min-width: 15%;
+    gap: 20px;
+
 }
 
 .ship-cell {

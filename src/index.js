@@ -289,6 +289,55 @@ class Player {
         }
     }
 
+    createRandomCoords() {
+        let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+
+        let x = Math.floor(Math.random() * 10) + 1;
+        let y = alphabet[Math.floor(Math.random() * 10)];
+
+        return [x, y]
+    }
+
+    createRandomOrientation() {
+        let orientations = ['Horizontal', 'Vertical'];
+        return orientations[Math.floor(Math.random() * 2)]
+    }
+
+    randomShipPlacement(user) {
+        let randomCoords = this.createRandomCoords()
+        let orientation = this.createRandomOrientation()
+        let x = randomCoords[0]
+        let y = randomCoords[1]
+
+        while (this.shipList.length !== 0) {
+            let ship = this.shipList[0]
+            this.placeShip(x, y, ship, orientation)
+            randomCoords = this.createRandomCoords()
+            orientation = this.createRandomOrientation()
+            x = randomCoords[0]
+            y = randomCoords[1]
+        }
+        let GameBoardCells
+        if (user === 'player') {
+            GameBoardCells = document.querySelectorAll('.player-gameBoard-cells .gameBoard-cell')
+        } else if (user === 'computer') {
+            GameBoardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
+        }
+
+        // let GameBoardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
+        let shipList = this.gameboard.shipList
+        shipList.forEach((ship) => {
+            ship.shipCoords.forEach((coord) => {
+                GameBoardCells.forEach((cell) => {
+                    if (cell.id === `${coord.y}${coord.x}`) {
+                        cell.classList.add('ship-cell')
+                    }
+                });
+            })
+        });
+
+    }
+
     placeShip(x, y, ship, orientation) {
         if (this.gameboard.findNodeInList(x, y) === null) {
             console.log("null")
@@ -337,47 +386,7 @@ class Computer extends Player {
     restartComputer() {
         this.coordsAttacked = []
     }
-    createRandomCoords() {
-        let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-        let x = Math.floor(Math.random() * 10) + 1;
-        let y = alphabet[Math.floor(Math.random() * 10)];
-
-        return [x, y]
-    }
-
-    createRandomOrientation() {
-        let orientations = ['Horizontal', 'Vertical'];
-        return orientations[Math.floor(Math.random() * 2)]
-    }
-
-    randomShipPlacement() {
-        let randomCoords = this.createRandomCoords()
-        let orientation = this.createRandomOrientation()
-        let x = randomCoords[0]
-        let y = randomCoords[1]
-
-        while (this.shipList.length !== 0) {
-            let ship = this.shipList[0]
-            this.placeShip(x, y, ship, orientation)
-            randomCoords = this.createRandomCoords()
-            orientation = this.createRandomOrientation()
-            x = randomCoords[0]
-            y = randomCoords[1]
-        }
-        let computerGameboardCells = document.querySelectorAll('.computer-gameBoard-cells .gameBoard-cell')
-        let shipList = this.gameboard.shipList
-        shipList.forEach((ship) => {
-            ship.shipCoords.forEach((coord) => {
-                computerGameboardCells.forEach((cell) => {
-                    if (cell.id === `${coord.y}${coord.x}`) {
-                        cell.classList.add('ship-cell')
-                    }
-                });
-            })
-        });
-
-    }
 
     randomAttack(playerGameboard) {
         let hitValid = false
@@ -433,6 +442,12 @@ class DomController {
             cell.style.backgroundColor = 'white'
         });
 
+    }
+
+
+    clearShipSelector() {
+        let shipSelectorContainer = document.querySelector('.ship-selector-container')
+        shipSelectorContainer.innerHTML = ''
     }
 
     addShipToSelector(ship) {
@@ -626,6 +641,7 @@ class GameLogic {
         this.computer = new Computer('Computer')
         this.domController = new DomController()
         this.setResetButton()
+        this.setrandomBoardButton()
     }
 
 
@@ -650,6 +666,15 @@ class GameLogic {
         this.computer.resetPlayer()
         this.computer.restartComputer()
         this.gameSetup()
+    }
+
+
+    setrandomBoardButton() {
+        let randomBoardButton = document.querySelector('.random-board')
+        randomBoardButton.addEventListener('click', () => {
+            this.player.randomShipPlacement('player')
+            this.domController.clearShipSelector()
+        });
     }
 
     setResetButton() {
@@ -690,7 +715,7 @@ class GameLogic {
         this.player.gameboard.createGameboard()
         this.computer.gameboard.createGameboard()
         this.domController.addPlayerBoardListeners(this.player)
-        this.computer.randomShipPlacement()
+        this.computer.randomShipPlacement('computer')
         this.domController.addShipToSelector(this.player.shipList[0])
 
         //use this to create  regular game loop
